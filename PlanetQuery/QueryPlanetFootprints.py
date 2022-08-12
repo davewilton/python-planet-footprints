@@ -65,7 +65,6 @@ class QueryPlanetFootprints:
 
     def _get_counts(self):
 
-        # loop through all AOI shapes one by one to use them as PlanetScope search extent for specific cloud cover %
         search_request = self.config
 
         # get the total count
