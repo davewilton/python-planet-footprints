@@ -31,7 +31,7 @@ class QueryPlanetFootprints:
         """
         self.API_key = planet_api_key
         self.logger = logging.getLogger(None)
-        self.config: PlanetQueryClass = self.create_config(json_query_path)
+        self.config = self.create_config(json_query_path)
         self._get_counts()
 
     def __iter__(self):
