@@ -1,0 +1,52 @@
+{
+	"filter": {
+		"type": "AndFilter",
+		"config": [{
+			"config": {
+				"coordinates": [
+					[
+						[151.826584, -27.737863],
+						[153.30944, -27.737863],
+						[153.30944, -25.160517],
+						[151.826584, -25.160517],
+						[151.826584, -27.737863]
+					]
+				],
+				"type": "Polygon"
+			},
+			"type": "GeometryFilter",
+			"field_name": "geometry"
+		}, {
+			"config": {
+				"gte": "2022-08-10T00:00:00Z",
+				"lte": "2022-08-12T23:59:59Z"
+			},
+			"type": "DateRangeFilter",
+			"field_name": "acquired"
+		}, {
+			"config": ["assets:download"],
+			"type": "PermissionFilter"
+		}, {
+			"config": [{
+				"config": [{
+					"config": ["PSScene"],
+					"type": "StringInFilter",
+					"field_name": "item_type"
+				}, {
+					"config": [{
+						"config": ["basic_analytic_4b"],
+						"type": "AssetFilter"
+					}],
+					"type": "AndFilter"
+				}],
+				"type": "AndFilter"
+			}, {
+				"config": ["Landsat8L1G", "PSOrthoTile", "REOrthoTile", "Landsat8L1G", "Sentinel2L1C", "SkySatCollect", "SkySatScene", "REScene"],
+				"type": "StringInFilter",
+				"field_name": "item_type"
+			}],
+			"type": "OrFilter"
+		}]
+	},
+	"item_types": ["Landsat8L1G", "PSOrthoTile", "REOrthoTile", "Landsat8L1G", "Sentinel2L1C", "SkySatCollect", "SkySatScene", "REScene", "PSScene"]
+}
