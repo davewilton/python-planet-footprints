@@ -32,6 +32,8 @@ class QueryPlanetFootprints:
         self.API_key = planet_api_key
         self.logger = logging.getLogger(None)
         self.config = self.create_config(json_query_path)
+        self.__features = []
+        self.__strNextPageUrl = None
         self._get_counts()
 
     def __iter__(self):
@@ -46,7 +48,7 @@ class QueryPlanetFootprints:
         else:
             # load more features?
             if self.__strNextPageUrl and self.__iter_counter < self.total_count:
-                self._do_search(self.config)
+                self._get_page(self.__strNextPageUrl)
                 feature = self.__features[self.__iter_counter]
             else:
                 raise StopIteration
@@ -55,9 +57,6 @@ class QueryPlanetFootprints:
 
     def create_config(self, json_path):
         try:
-            # with open(json_path) as json_file:
-            #     json.load(json_path)
-            #     query = PlanetQueryClass.from_dict(json.load(json_file))
             return json.loads(open(json_path).read())
         except Exception as Ex:
             self.logger.error(Ex)
@@ -114,6 +113,26 @@ class QueryPlanetFootprints:
 
         return result
 
+    def _get_page(self, url: str):
+        search_result = requests.get(
+            url,
+            auth=HTTPBasicAuth(self.API_key, ''))
+
+        json_results = search_result.json()
+
+        if 'features' not in json_results:
+            self.logger.error("Error searching planet")
+            self.logger.error(json.dumps(json_results, indent=2))
+            raise PlanetException("Error searching planet")
+        elif len(json_results['features']) == 0:
+            self.logger.warning("No features returned")
+            return
+
+        result = SearchResult.from_dict(json_results)
+
+        self.__features.extend(result.features)
+        if result.links:
+            self.__strNextPageUrl = result.links.next
 
 class PlanetException(Exception):
     pass

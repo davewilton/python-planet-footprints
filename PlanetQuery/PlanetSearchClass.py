@@ -13,6 +13,8 @@ def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
 def from_float(x: Any) -> float:
     if not x:
         return 0
+    if  isinstance(x, list):
+        float(x[0])
     assert isinstance(x, (float, int)) and not isinstance(x, bool)
     return float(x)
 
@@ -291,7 +293,7 @@ class FootprintFeature:
             f_type = obj.get("type")
             return FootprintFeature(links, permissions, assets, geometry, sid, properties, f_type)
         except Exception as ex:
-            print("error deserializing feature with ID {0}. Exception::  ".format(str(obj.get("id"), str(ex))))
+            print("error deserializing feature with ID {0}.".format(str(obj.get("id"))))
             raise ex
 
     def to_dict(self) -> dict:
@@ -352,7 +354,7 @@ class SearchResult:
             return SearchResult(links, features, search_type)
         except Exception as ex:
             print(ex)
-            raise TypeError(str(ex))
+            raise TypeError("error in SearchResult.from_dict")
 
     def to_dict(self) -> dict:
         result: dict = dict()
