@@ -113,26 +113,41 @@ class QueryPlanetFootprints:
 
         return result
 
+    retry_count = 0
+
     def _get_page(self, url: str):
-        search_result = requests.get(
-            url,
-            auth=HTTPBasicAuth(self.API_key, ''))
 
-        json_results = search_result.json()
+        try:
 
-        if 'features' not in json_results:
-            self.logger.error("Error searching planet")
-            self.logger.error(json.dumps(json_results, indent=2))
-            raise PlanetException("Error searching planet")
-        elif len(json_results['features']) == 0:
-            self.logger.warning("No features returned")
-            return
+            search_result = requests.get(
+                url,
+                auth=HTTPBasicAuth(self.API_key, ''))
 
-        result = SearchResult.from_dict(json_results)
+            json_results = search_result.json()
 
-        self.__features.extend(result.features)
-        if result.links:
-            self.__strNextPageUrl = result.links.next
+            if 'features' not in json_results:
+                self.logger.error("Error searching planet")
+                self.logger.error(json.dumps(json_results, indent=2))
+                raise PlanetException("Error searching planet")
+            elif len(json_results['features']) == 0:
+                self.logger.warning("No features returned")
+                return
+
+            result = SearchResult.from_dict(json_results)
+
+            self.__features.extend(result.features)
+            if result.links:
+                self.__strNextPageUrl = result.links.next
+
+        except Exception as ex:
+            # planet api pages often fail with very large requests so retry the pages
+            print("error getting page, trying again...")
+            if self.retry_count < 10:
+                self.retry_count += 1
+                self._get_page(self.__strNextPageUrl)
+        finally:
+            self.retry_count += 1
+
 
 class PlanetException(Exception):
     pass
