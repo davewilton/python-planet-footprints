@@ -146,7 +146,7 @@ class QueryPlanetFootprints:
                 self.retry_count += 1
                 self._get_page(self.__strNextPageUrl)
         finally:
-            self.retry_count += 1
+            self.retry_count = 0
 
 
 class PlanetException(Exception):
